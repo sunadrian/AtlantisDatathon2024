@@ -1,7 +1,7 @@
 import pandas as pd
 from pathlib import Path
 
-def filereader(path) -> pd.DataFrame:
+def load_dataset(path) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
@@ -25,6 +25,6 @@ def calc_zipcode_stats(df: pd.DataFrame) -> dict:
 
 
 
-if __name__ == "__main__":
-    df = filereader(Path("PropertyAssessmentData.csv"))
-    zipcode_stats = calc_zipcode_stats(df)
+# if __name__ == "__main__":
+#     df = filereader(Path("PropertyAssessmentData.csv"))
+#     zipcode_stats = calc_zipcode_stats(df)
