@@ -32,7 +32,12 @@ Change the directory in the terminal to the current repository and run:
 
 # Methods
 
+**Data Processing**
+
+We processed the data by dropping columns we deemed unnecessary(i.e. pool area) and extracted features relevant to the data we wanted to visualize. 
+
 **Data Visualization**
+
 Based on our visualizations there are 3 key takeaways:
 - The average cost of housing per year follows the steady climb, describing the story of inflation and the housing crisis in 2008
 - The room distribution peaks and shows that 29% of buildings in dataset have 6 rooms
