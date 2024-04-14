@@ -30,7 +30,7 @@ def launch_gui(dataset_df, zipcode_stats, geojson_data):
     
     #Create title and interactive map
     with st.empty(): 
-        title = st.title(":violet[Best Building Buyer] 💸", anchor=False)
+        title = st.title(":violet[Building Buyer] 💸", anchor=False)
 
     figure_container = st.empty()
     fig = px.choropleth_mapbox(zipcode_stats, geojson=geojson_data, color=zipcode_stats['Avg Value'],
