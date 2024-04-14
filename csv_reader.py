@@ -29,9 +29,8 @@ def abs_difference(a, b):
 def difference(a, b):
     return a - b
 
-Property_Info = namedtuple('Property_Info', ['address', 'rooms', 'fireplace', 'security', 'sprinklers'])
-def fiveclosest(dataframe, budget, zipcode, budgetcheckbox = False):
-    # storage = {}
+Property_Info = namedtuple('Property_Info', ['address', 'totalcost','rooms', 'fireplace', 'security', 'sprinklers'])
+def fiveclosest(dataframe, budget, zipcode, budgetcheckbox):
     differences = []
     associated_info = []
     cur_df = dataframe[dataframe['ZipCode'] == zipcode]
@@ -41,11 +40,10 @@ def fiveclosest(dataframe, budget, zipcode, budgetcheckbox = False):
     else:
         cur_df = cur_df[cur_df['TotalAssessedValue'] <= budget]
         diff_func = difference
-        print(cur_df)
 
     for i, row in cur_df.iterrows():
         cost = row.iloc[15]
-        new_info = Property_Info(row['PropertyAddress'], row['TotalNumberOfRooms'], row['HasFireplace'],
+        new_info = Property_Info(row['PropertyAddress'], cost,row['TotalNumberOfRooms'], row['HasFireplace'],
                                             row['HasSecurityAlarm'], row['HasSprinklers'])
         if len(differences) < 5:
             differences.append(diff_func(budget, cost))
@@ -57,12 +55,13 @@ def fiveclosest(dataframe, budget, zipcode, budgetcheckbox = False):
                 differences.append(diff_func(budget, cost))
                 associated_info.pop(removed_index)
                 associated_info.append(new_info)
+    associated_info = list(sorted(associated_info, key=lambda x: x.totalcost, reverse=True))
     return associated_info
 
-if __name__ == "__main__":
-    df = load_dataset(Path("PropertyAssessmentData.csv"))
-    zipcode_stats = calc_zipcode_stats(df)
+# if __name__ == "__main__":
+#     df = load_dataset(Path("PropertyAssessmentData.csv"))
+#     zipcode_stats = calc_zipcode_stats(df)
 
-    res = fiveclosest(df, 280000, 92706, True)
-    for r in res:
-        print(r)
+#     res = fiveclosest(df, 280000, 92706, True)
+#     for r in res:
+#         print(r)

@@ -4,9 +4,8 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import json
+from csv_reader import load_dataset, calc_zipcode_stats, fiveclosest
 
-
-from csv_reader import load_dataset, calc_zipcode_stats
 
 DATASET_PATH = Path('PropertyAssessmentData.csv')
 
@@ -27,10 +26,13 @@ def cache_variables():
     
 
 def launch_gui(dataset_df, zipcode_stats, geojson_data):
+    
+    
     #Create title and interactive map
     with st.empty(): 
-        title = st.title(":violet[Temp Title]:sunglasses:", anchor=False)
+        title = st.title(":violet[Best Building Buyer] 💸", anchor=False)
 
+    figure_container = st.empty()
     fig = px.choropleth_mapbox(zipcode_stats, geojson=geojson_data, color=zipcode_stats['Avg Value'],
                             locations=zipcode_stats.index, featureidkey="properties.ZCTA5CE10",
                             mapbox_style="carto-positron", hover_data=zipcode_stats.columns,
@@ -38,10 +40,9 @@ def launch_gui(dataset_df, zipcode_stats, geojson_data):
                             zoom=8, center={"lat": 33.710924, "lon": -117.791848},
                             opacity=0.5, color_continuous_scale="plasma",
                             labels={'Mean GDP':'Mean Total Assessed Value'})
-    st.plotly_chart(fig)
     # Customize the layout
     fig.update_geos(fitbounds="locations",visible=False)
-
+    figure_container.plotly_chart(fig)
 
     # Set up Search features and handle search
     with st.empty():
@@ -60,7 +61,7 @@ def launch_gui(dataset_df, zipcode_stats, geojson_data):
 
     if search_button:
         if max_budget == '':
-            max_budget = float('inf')
+            max_budget = (2 ** 31)  - 1
 
         if search_zipcode.isdigit() is False:
             st.write("Invalid ZipCode, please enter a valid number")
@@ -73,7 +74,16 @@ def launch_gui(dataset_df, zipcode_stats, geojson_data):
             search_zipcode = int(search_zipcode)
             max_budget = int(max_budget)
             if search_zipcode in zipcode_stats.index:
-                st.write('It worked')
+                res = fiveclosest(dataset_df, max_budget, search_zipcode, checkbox_value)
+                for r in res:
+                    st.text_area(f'Address: {r.address}:',value=f'Total Cost: ${r.totalcost}\nNumber of Rooms:{r.rooms}\nHas Fireplace: {r.fireplace}\nHas Security Alarms: {r.security}\nHas Sprinklers: {r.sprinklers}', 
+                                 height=150, disabled=True)
+                
+                cur_row = zipcode_stats.loc[search_zipcode]
+                new_lat = cur_row['ZipCode Lat']
+                new_long = cur_row['ZipCode Long']
+                fig.update_layout(mapbox_center={"lat": new_lat, "lon": new_long}, mapbox_zoom=13)
+                figure_container.plotly_chart(fig)
             else:
                 st.write("This ZipCode does not exist in our dataset, please try again.")
 
